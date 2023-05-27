@@ -149,22 +149,60 @@ def test_filter(hamtesting, spamtesting, k, m):
 	return ham_hit_ratio, spam_hit_ratio, ham_total, spam_total, ham_as_spam, spam_as_ham
 
 
+#Hàm kiểm tra hiệu suất và phân loại thư phần testing
+def recognize_email_on_folder():
+	spamtesting = os.getcwd() + '/emails/spamtesting'
+	hamtesting  = os.getcwd() + '/emails/hamtesting'
 
-spamtesting = os.getcwd() + '/emails/spamtesting'
-hamtesting  = os.getcwd() + '/emails/hamtesting'
+	ham_hit_ratio, spam_hit_ratio, ham_total, spam_total, ham_as_spam, spam_as_ham = test_filter(hamtesting, spamtesting, k=5, m=1)
 
-ham_hit_ratio, spam_hit_ratio, ham_total, spam_total, ham_as_spam, spam_as_ham = test_filter(hamtesting, spamtesting, k=5, m=1)
+	print ()
+	print ("Tỉ lệ thư đúng chính xác: ", ham_hit_ratio * 100)
+	print ("Tỉ lệ thư rác chính xác:    ", spam_hit_ratio * 100)
+	print ("Tỉ lệ nhận biết đúng: ", (ham_hit_ratio*ham_total + spam_hit_ratio*spam_total) / (ham_total + spam_total) * 100)
 
-print ()
-print ("Tỉ lệ thư đúng chính xác: ", ham_hit_ratio * 100)
-print ("Tỉ lệ thư rác chính xác:    ", spam_hit_ratio * 100)
-print ("Tỉ lệ nhận biết đúng: ", (ham_hit_ratio*ham_total + spam_hit_ratio*spam_total) / (ham_total + spam_total) * 100)
+	print ("\nCác thư đúng nhưng gắn nhãn thư rác:")
+	for file in ham_as_spam:
+		print ("\t"+file)
 
-print ("\nCác thư đúng nhưng gắn nhãn thư rác:")
-for file in ham_as_spam:
-	print ("\t"+file)
+	print ("\nCác thư rác nhưng gắn nhãn thư đúng:")
+	for file in spam_as_ham:
+		print ("\t"+file)
+	print()
+        
 
-print ("\nCác thư rác nhưng gắn nhãn thư đúng:")
-for file in spam_as_ham:
-	print ("\t"+file)
-print()
+#Hàm kiểm tra thư nhập input là hợp lệ hay không?		
+def classify_email_from_input(ham_distribution, spam_distribution, m):
+    email = input("Nhập nội dung email: ")
+    
+    ham_probability = 0
+    spam_probability = 0
+
+    email_words = email.split()  # Chia nội dung email thành danh sách các từ
+
+    for word in email_words:
+        ham_probability += math.log(probability(word, 'ham', ham_distribution, spam_distribution, m))
+        spam_probability += math.log(probability(word, 'spam', ham_distribution, spam_distribution, m))
+
+    classification = 'ham' if ham_probability > spam_probability else 'spam'
+    print("Phân loại: ", classification)
+
+
+ham_distribution, spam_distribution = lexicon(5)
+
+def main():
+    ham_distribution, spam_distribution = lexicon(k=5)
+    
+    print("1. Phân loại email từ input")
+    print("2. Kiểm tra hiệu suất của bộ lọc trên thư mục")
+    choice = input("Chọn một tác vụ (1/2): ")
+    
+    if choice == "1":
+        classify_email_from_input(ham_distribution, spam_distribution, m=1)
+    elif choice == "2":
+        recognize_email_on_folder()
+    else:
+        print("Lựa chọn không hợp lệ.")
+
+if __name__ == "__main__":
+    main()
