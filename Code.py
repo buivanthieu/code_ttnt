@@ -184,7 +184,7 @@ def classify_email_from_input(ham_distribution, spam_distribution, m):
         ham_probability += math.log(probability(word, 'ham', ham_distribution, spam_distribution, m))
         spam_probability += math.log(probability(word, 'spam', ham_distribution, spam_distribution, m))
 
-    classification = 'ham' if ham_probability > spam_probability else 'spam'
+    classification = 'Email hợp lệ' if ham_probability > spam_probability else 'Email là Spam'
     print("Phân loại: ", classification)
 
 
